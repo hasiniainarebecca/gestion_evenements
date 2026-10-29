@@ -2,7 +2,7 @@ import os
 import random
 import string
 from django.core.management.base import BaseCommand
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import User, Group, Permission # <-- AJOUT DE Permission ICI
 from django.utils import timezone
 from datetime import timedelta
 from events.models import Categorie, Evenement, Inscription
@@ -13,6 +13,15 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         # 1. Créer le groupe Gestionnaire
         group, _ = Group.objects.get_or_create(name='Gestionnaire')
+
+        # --- AJOUT : Donner la permission events.add_evenement au groupe ---
+        try:
+            # On cherche la permission de créer un événement (add_evenement)
+            permission = Permission.objects.get(codename='add_evenement')
+            group.permissions.add(permission)
+        except Permission.DoesNotExist:
+            self.stdout.write(self.style.WARNING("La permission add_evenement n'existe pas encore. Assurez-vous d'avoir fait 'migrate'."))
+        # -------------------------------------------------------------------
 
         # 2. Gérer le mot de passe
         password = os.environ.get('DEMO_PASSWORD')
