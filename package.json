@@ -1,0 +1,25 @@
+{
+  "name": "gestion_evenements",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "dev": "npx @tailwindcss/cli -i ./static/src/input.css -o ./static/css/output.css --watch",
+    "build": "npx @tailwindcss/cli -i ./static/src/input.css -o ./static/css/output.css --minify"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hasiniainarebecca/gestion_evenements.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/hasiniainarebecca/gestion_evenements/issues"
+  },
+  "homepage": "https://github.com/hasiniainarebecca/gestion_evenements#readme",
+  "description": "",
+  "dependencies": {
+    "@tailwindcss/cli": "^4.3.3",
+    "tailwindcss": "^4.3.3"
+  }
+}
