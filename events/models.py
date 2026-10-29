@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
+from django.core.exceptions import ValidationError # <--- AJOUT POUR LA VALIDATION
 
 class Categorie(models.Model):
     nom = models.CharField(max_length=80, unique=True)
@@ -55,6 +56,17 @@ class Inscription(models.Model):
 
     def __str__(self):
         return f"{self.utilisateur.username} - {self.evenement.titre}"
+
+    # CORRECTION SOURCERY : Validation de la capacité et de la date
+    def clean(self):
+        # On ne vérifie que si l'inscription est (ou devient) confirmée
+        if self.statut == 'confirmee':
+            # Si c'est une nouvelle inscription (pas encore enregistrée en base)
+            if not self.pk:
+                if self.evenement.est_complet():
+                    raise ValidationError("Impossible de s'inscrire : cet événement est déjà complet.")
+                if self.evenement.est_passe():
+                    raise ValidationError("Impossible de s'inscrire : cet événement est déjà passé.")
 
     class Meta:
         # Contrainte d'unicité : un utilisateur ne peut avoir qu'une seule inscription "confirmée" par événement
