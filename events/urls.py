@@ -1,9 +1,13 @@
 from django.urls import path
 from . import views
+from . import views_public
 
 urlpatterns = [
-    path('', views.event_list, name='event_list'),
-    path('evenements/<int:pk>/', views.event_detail, name='event_detail'),
+    # 1. Les routes publiques gérées par Membre B (dans views_public.py)
+    path('', views_public.event_list, name='event_list'),
+    path('evenements/<int:pk>/', views_public.event_detail, name='event_detail'),
+
+    # 2. Les routes temporaires gérées par Membre C (dans views.py)
     path('evenements/<int:pk>/inscription/', views.register, name='register'),
     path('mes-inscriptions/', views.my_registrations, name='my_registrations'),
     path('inscriptions/<int:pk>/annuler/', views.cancel_registration, name='cancel_registration'),
