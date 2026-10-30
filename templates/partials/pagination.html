@@ -1,17 +1,21 @@
 {% if page_obj.has_other_pages %}
-<nav class="mt-8 flex flex-wrap items-center justify-center gap-2" aria-label="Pagination">
+<nav class="mt-10 flex flex-wrap items-center justify-center gap-3" aria-label="Pagination">
   {% if page_obj.has_previous %}
     <a href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value|urlencode }}{% endif %}{% endfor %}"
-       class="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm hover:bg-slate-50">Précédent</a>
+       class="inline-flex items-center gap-1.5 rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-brand-800 transition hover:border-brand-700 hover:bg-brand-50">
+      <span aria-hidden="true">&larr;</span> Précédent
+    </a>
   {% endif %}
 
-  <span class="px-3 py-1.5 text-sm text-slate-600">
+  <span class="px-3 text-sm text-slate-600">
     Page {{ page_obj.number }} sur {{ page_obj.paginator.num_pages }}
   </span>
 
   {% if page_obj.has_next %}
     <a href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value|urlencode }}{% endif %}{% endfor %}"
-       class="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm hover:bg-slate-50">Suivant</a>
+       class="inline-flex items-center gap-1.5 rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-brand-800 transition hover:border-brand-700 hover:bg-brand-50">
+      Suivant <span aria-hidden="true">&rarr;</span>
+    </a>
   {% endif %}
 </nav>
 {% endif %}

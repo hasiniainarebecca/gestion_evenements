@@ -1,9 +1,10 @@
 {% if messages %}
-<div class="mx-auto max-w-6xl space-y-3 px-4 pt-6">
+<div class="mx-auto w-full max-w-6xl space-y-3 px-4 pt-6">
   {% for message in messages %}
     <div role="{% if message.tags == 'error' %}alert{% else %}status{% endif %}"
-         class="rounded-lg border px-4 py-3 {% if message.tags == 'success' %}border-emerald-200 bg-emerald-50 text-emerald-800{% elif message.tags == 'error' %}border-red-200 bg-red-50 text-red-800{% elif message.tags == 'warning' %}border-amber-200 bg-amber-50 text-amber-800{% else %}border-sky-200 bg-sky-50 text-sky-800{% endif %}">
-      {{ message }}
+         class="flex items-start gap-3 rounded-xl border border-slate-200 border-l-4 bg-white px-4 py-3 shadow-sm {% if message.tags == 'success' %}border-l-emerald-500 text-emerald-900{% elif message.tags == 'error' %}border-l-red-500 text-red-900{% elif message.tags == 'warning' %}border-l-amber-500 text-amber-900{% else %}border-l-sky-500 text-sky-900{% endif %}">
+      <span class="mt-1.5 inline-block size-2 shrink-0 rounded-full {% if message.tags == 'success' %}bg-emerald-500{% elif message.tags == 'error' %}bg-red-500{% elif message.tags == 'warning' %}bg-amber-500{% else %}bg-sky-500{% endif %}"></span>
+      <p class="text-sm font-medium">{{ message }}</p>
     </div>
   {% endfor %}
 </div>

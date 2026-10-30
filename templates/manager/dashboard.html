@@ -4,41 +4,45 @@
 
 {% block content %}
 <div>
-  <div class="flex flex-wrap items-center justify-between gap-3">
-    <h1 class="text-2xl font-bold text-slate-900 sm:text-3xl">Tableau de bord</h1>
-    <a href="{% url 'event_create' %}" class="inline-flex items-center rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-brand-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2">Nouvel événement</a>
+  <div class="flex flex-wrap items-end justify-between gap-4">
+    <div>
+      <p class="text-xs font-semibold uppercase tracking-[0.25em] text-gold-600">Espace gestionnaire</p>
+      <h1 class="mt-2 text-3xl font-semibold text-brand-900 sm:text-4xl">Tableau de bord</h1>
+      <p class="mt-2 text-sm text-slate-600">
+        {{ page_obj.paginator.count }} événement{{ page_obj.paginator.count|pluralize }} au total, passés compris.
+      </p>
+    </div>
+    <a href="{% url 'event_create' %}" class="inline-flex items-center gap-2 rounded-xl bg-brand-700 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2">
+      <span aria-hidden="true" class="text-lg leading-none">+</span> Nouvel événement
+    </a>
   </div>
 
-  <p class="mt-2 text-sm text-slate-600">
-    {{ page_obj.paginator.count }} événement{{ page_obj.paginator.count|pluralize }} au total, passés compris.
-  </p>
-
-  <div class="mt-6 overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-sm">
+  <div class="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
     <table class="min-w-full divide-y divide-slate-200 text-sm">
-      <thead class="bg-slate-50 text-left text-slate-600">
+      <thead class="bg-brand-50 text-left text-xs uppercase tracking-wider text-brand-800">
         <tr>
-          <th scope="col" class="px-4 py-3 font-semibold">Événement</th>
-          <th scope="col" class="px-4 py-3 font-semibold">Date</th>
-          <th scope="col" class="px-4 py-3 font-semibold">Inscrits</th>
-          <th scope="col" class="px-4 py-3 font-semibold">État</th>
-          <th scope="col" class="px-4 py-3 font-semibold">Actions</th>
+          <th scope="col" class="px-5 py-3.5 font-semibold">Événement</th>
+          <th scope="col" class="px-5 py-3.5 font-semibold">Date</th>
+          <th scope="col" class="px-5 py-3.5 font-semibold">Inscrits</th>
+          <th scope="col" class="px-5 py-3.5 font-semibold">État</th>
+          <th scope="col" class="px-5 py-3.5 font-semibold">Actions</th>
         </tr>
       </thead>
       <tbody class="divide-y divide-slate-200">
         {% for evenement in page_obj %}
-          <tr>
-            <td class="px-4 py-3">
-              <p class="font-semibold text-slate-900">{{ evenement.titre }}</p>
+          <tr class="transition hover:bg-slate-50">
+            <td class="px-5 py-4">
+              <p class="font-semibold text-brand-900">{{ evenement.titre }}</p>
               <p class="text-slate-600">{{ evenement.categorie.nom }} · {{ evenement.lieu }}</p>
             </td>
-            <td class="whitespace-nowrap px-4 py-3 text-slate-700">{{ evenement.date_debut|date:"d/m/Y à H:i" }}</td>
-            <td class="px-4 py-3">
+            <td class="whitespace-nowrap px-5 py-4 text-slate-700">{{ evenement.date_debut|date:"d/m/Y à H:i" }}</td>
+            <td class="px-5 py-4">
               <p class="whitespace-nowrap text-slate-700">{{ evenement.nb_confirmees }} / {{ evenement.capacite }}</p>
-              <div class="mt-1 h-2 w-32 rounded-full bg-slate-200">
-                <div class="h-2 rounded-full bg-brand-600" style="width: {% widthratio evenement.nb_confirmees evenement.capacite 100 %}%"></div>
+              <div class="mt-1.5 h-2 w-32 rounded-full bg-slate-200">
+                <div class="h-2 rounded-full bg-linear-to-r from-brand-700 to-gold-500" style="width: {% widthratio evenement.nb_confirmees evenement.capacite 100 %}%"></div>
               </div>
             </td>
-            <td class="px-4 py-3">
+            <td class="px-5 py-4">
               {% if evenement.est_passe %}
                 <span class="inline-flex rounded-full bg-slate-200 px-2.5 py-0.5 text-xs font-medium text-slate-700">Terminé</span>
               {% elif evenement.nb_confirmees >= evenement.capacite %}
@@ -47,18 +51,18 @@
                 <span class="inline-flex rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-medium text-emerald-800">À venir</span>
               {% endif %}
             </td>
-            <td class="px-4 py-3">
+            <td class="px-5 py-4">
               <div class="flex flex-wrap gap-2">
-                <a href="{% url 'event_registrants' evenement.pk %}" class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm font-semibold text-slate-700 hover:bg-slate-50">Voir les inscrits</a>
+                <a href="{% url 'event_registrants' evenement.pk %}" class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm font-semibold text-brand-800 transition hover:border-brand-700 hover:bg-brand-50">Voir les inscrits</a>
                 {% if not evenement.est_passe %}
-                  <a href="{% url 'event_update' evenement.pk %}" class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm font-semibold text-slate-700 hover:bg-slate-50">Modifier</a>
+                  <a href="{% url 'event_update' evenement.pk %}" class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm font-semibold text-brand-800 transition hover:border-brand-700 hover:bg-brand-50">Modifier</a>
                 {% endif %}
               </div>
             </td>
           </tr>
         {% empty %}
           <tr>
-            <td colspan="5" class="px-4 py-6 text-center text-slate-600">Aucun événement pour le moment.</td>
+            <td colspan="5" class="px-5 py-8 text-center text-slate-600">Aucun événement pour le moment.</td>
           </tr>
         {% endfor %}
       </tbody>
