@@ -3,14 +3,16 @@ from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView
 from django.core.exceptions import PermissionDenied
+from django.core.paginator import Paginator
 from django.db import IntegrityError, transaction
-from django.http import HttpResponse
+from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.views.decorators.http import require_POST
 
-from .forms import ConnexionForm, InscriptionForm
+from .forms import ConnexionForm, EvenementForm, InscriptionForm
 from .models import Evenement, Inscription
+from .permissions import gestionnaire_requis
 
 
 # ---------------------------------------------------------------------------
@@ -160,11 +162,122 @@ def logout_view(request):
 
 
 # ---------------------------------------------------------------------------
-# VUES TEMPORAIRES : seront remplacées aux étapes suivantes
+# GESTIONNAIRE : tableau de bord, événements, inscrits, annulation (F13 à F16, F18)
+# Toutes ces vues sont protégées par @gestionnaire_requis (RG10) :
+# visiteur -> page de connexion, connecté sans droit -> erreur 403.
 # ---------------------------------------------------------------------------
 
-def manager_dashboard(request): return HttpResponse("Tableau de bord (à faire)")
-def event_create(request): return HttpResponse("Créer événement (à faire)")
-def event_update(request, pk): return HttpResponse("Modifier événement (à faire)")
-def event_registrants(request, pk): return HttpResponse("Liste des inscrits (à faire)")
-def manager_cancel_registration(request, pk): return HttpResponse("Annulation gestionnaire (à faire)")
+@gestionnaire_requis
+def manager_dashboard(request):
+    """F15 : tous les événements (même passés), avec inscrits confirmés / capacité."""
+    evenements = (
+        Evenement.objects.select_related('categorie')
+        .annotate(nb_confirmees=Count(
+            'inscriptions', filter=Q(inscriptions__statut='confirmee')
+        ))
+        .order_by('-date_debut')
+    )
+    page_obj = Paginator(evenements, 10).get_page(request.GET.get('page'))
+    return render(request, 'manager/dashboard.html', {'page_obj': page_obj})
+
+
+@gestionnaire_requis
+def event_create(request):
+    """F13 : créer un événement (validation RG12 dans EvenementForm)."""
+    if request.method == 'POST':
+        form = EvenementForm(request.POST)
+        if form.is_valid():
+            evenement = form.save(commit=False)
+            evenement.createur = request.user
+            evenement.save()
+            messages.success(request, f"L'événement « {evenement.titre} » a été créé.")
+            return redirect('manager_dashboard')
+    else:
+        form = EvenementForm()
+    return render(request, 'manager/event_form.html', {'form': form})
+
+
+@gestionnaire_requis
+def event_update(request, pk):
+    """F14 : modifier un événement (RG11, RG12, RG14)."""
+    evenement = get_object_or_404(Evenement, pk=pk)
+    if evenement.est_passe():  # RG14
+        messages.error(request, "Cet événement est déjà passé : il ne peut plus être modifié.")
+        return redirect('manager_dashboard')
+
+    if request.method == 'POST':
+        # La vérification de la capacité (RG11) et l'enregistrement sont dans
+        # la même transaction : une inscription qui arrive entre les deux ne
+        # peut pas faire passer la capacité sous le nombre d'inscrits.
+        with transaction.atomic():
+            a_modifier = Evenement.objects.select_for_update().get(pk=pk)
+            form = EvenementForm(request.POST, instance=a_modifier)
+            if form.is_valid():
+                form.save()
+                messages.success(request, "L'événement a bien été modifié.")
+                return redirect('manager_dashboard')
+    else:
+        form = EvenementForm(instance=evenement)
+    return render(request, 'manager/event_form.html', {
+        'form': form, 'evenement': evenement,
+    })
+
+
+@gestionnaire_requis
+def event_registrants(request, pk):
+    """F16 : liste des inscrits d'un événement, avec totaux et filtre par statut."""
+    evenement = get_object_or_404(Evenement.objects.select_related('categorie'), pk=pk)
+
+    toutes = evenement.inscriptions.select_related('utilisateur', 'annulee_par')
+    totaux = toutes.aggregate(
+        nb_confirmees=Count('pk', filter=Q(statut='confirmee')),
+        nb_annulees=Count('pk', filter=Q(statut='annulee')),
+    )
+
+    statut = request.GET.get('statut', '')
+    if statut in ('confirmee', 'annulee'):
+        inscriptions = toutes.filter(statut=statut)
+    else:
+        statut = ''
+        inscriptions = toutes
+
+    return render(request, 'manager/registrants.html', {
+        'evenement': evenement,
+        'inscriptions': inscriptions.order_by('date_inscription'),
+        'nb_confirmees': totaux['nb_confirmees'],
+        'nb_annulees': totaux['nb_annulees'],
+        'statut': statut,
+    })
+
+
+@gestionnaire_requis
+def manager_cancel_registration(request, pk):
+    """F18 : le gestionnaire annule l'inscription d'un participant (RG13, RG17).
+
+    GET = page de confirmation, POST = annulation. Le gestionnaire est
+    enregistré dans annulee_par.
+    """
+    inscription = get_object_or_404(
+        Inscription.objects.select_related('evenement', 'utilisateur'), pk=pk
+    )
+    retour = redirect('event_registrants', pk=inscription.evenement_id)
+
+    if request.method == 'POST':
+        erreur = _annuler(inscription.pk, par=request.user)
+        if erreur:
+            messages.error(request, erreur)
+        else:
+            messages.success(
+                request,
+                f"L'inscription de {inscription.utilisateur.username} a bien été annulée."
+            )
+        return retour
+
+    # GET : on n'affiche la confirmation que si l'annulation est possible.
+    if inscription.statut == 'annulee':
+        messages.error(request, "Cette inscription est déjà annulée.")
+        return retour
+    if inscription.evenement.est_passe():
+        messages.error(request, "Impossible d'annuler : l'événement a déjà commencé.")
+        return retour
+    return render(request, 'manager/cancel_confirm.html', {'inscription': inscription})
