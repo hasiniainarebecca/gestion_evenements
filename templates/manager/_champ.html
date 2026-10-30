@@ -1,0 +1,8 @@
+<label for="{{ champ.id_for_label }}" class="mb-1 block text-sm font-medium text-slate-700">{{ champ.label }}</label>
+{{ champ }}
+{% if champ.help_text %}
+  <p class="mt-1 text-sm text-slate-600">{{ champ.help_text }}</p>
+{% endif %}
+{% for error in champ.errors %}
+  <p class="mt-1 text-sm text-red-600">{{ error }}</p>
+{% endfor %}

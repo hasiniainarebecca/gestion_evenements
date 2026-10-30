@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block title %}Tableau de bord{% endblock %}
+
+{% block content %}
+<div>
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <h1 class="text-2xl font-bold text-slate-900 sm:text-3xl">Tableau de bord</h1>
+    <a href="{% url 'event_create' %}" class="inline-flex items-center rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-brand-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2">Nouvel événement</a>
+  </div>
+
+  <p class="mt-2 text-sm text-slate-600">
+    {{ page_obj.paginator.count }} événement{{ page_obj.paginator.count|pluralize }} au total, passés compris.
+  </p>
+
+  <div class="mt-6 overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-sm">
+    <table class="min-w-full divide-y divide-slate-200 text-sm">
+      <thead class="bg-slate-50 text-left text-slate-600">
+        <tr>
+          <th scope="col" class="px-4 py-3 font-semibold">Événement</th>
+          <th scope="col" class="px-4 py-3 font-semibold">Date</th>
+          <th scope="col" class="px-4 py-3 font-semibold">Inscrits</th>
+          <th scope="col" class="px-4 py-3 font-semibold">État</th>
+          <th scope="col" class="px-4 py-3 font-semibold">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-200">
+        {% for evenement in page_obj %}
+          <tr>
+            <td class="px-4 py-3">
+              <p class="font-semibold text-slate-900">{{ evenement.titre }}</p>
+              <p class="text-slate-600">{{ evenement.categorie.nom }} · {{ evenement.lieu }}</p>
+            </td>
+            <td class="whitespace-nowrap px-4 py-3 text-slate-700">{{ evenement.date_debut|date:"d/m/Y à H:i" }}</td>
+            <td class="px-4 py-3">
+              <p class="whitespace-nowrap text-slate-700">{{ evenement.nb_confirmees }} / {{ evenement.capacite }}</p>
+              <div class="mt-1 h-2 w-32 rounded-full bg-slate-200">
+                <div class="h-2 rounded-full bg-brand-600" style="width: {% widthratio evenement.nb_confirmees evenement.capacite 100 %}%"></div>
+              </div>
+            </td>
+            <td class="px-4 py-3">
+              {% if evenement.est_passe %}
+                <span class="inline-flex rounded-full bg-slate-200 px-2.5 py-0.5 text-xs font-medium text-slate-700">Terminé</span>
+              {% elif evenement.nb_confirmees >= evenement.capacite %}
+                <span class="inline-flex rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-800">Complet</span>
+              {% else %}
+                <span class="inline-flex rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-medium text-emerald-800">À venir</span>
+              {% endif %}
+            </td>
+            <td class="px-4 py-3">
+              <div class="flex flex-wrap gap-2">
+                <a href="{% url 'event_registrants' evenement.pk %}" class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm font-semibold text-slate-700 hover:bg-slate-50">Voir les inscrits</a>
+                {% if not evenement.est_passe %}
+                  <a href="{% url 'event_update' evenement.pk %}" class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm font-semibold text-slate-700 hover:bg-slate-50">Modifier</a>
+                {% endif %}
+              </div>
+            </td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="5" class="px-4 py-6 text-center text-slate-600">Aucun événement pour le moment.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% include 'partials/pagination.html' %}
+</div>
+{% endblock %}
