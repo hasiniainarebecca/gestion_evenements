@@ -71,7 +71,7 @@
       {% if inscription_active %}
         <p class="text-slate-700">Vous êtes inscrit(e) à cet événement.</p>
         <a href="{% url 'cancel_registration' inscription_active.pk %}"
-           class="mt-3 inline-flex items-center rounded-xl bg-red-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-red-700">Annuler mon inscription</a>
+           class="mt-3 inline-flex items-center rounded-xl border border-red-200 bg-red-50 px-5 py-2.5 text-sm font-semibold text-red-700 transition hover:bg-red-700 hover:text-white">Annuler mon inscription</a>
 
       {% elif evenement.est_complet %}
         <span class="inline-flex cursor-not-allowed items-center rounded-xl bg-slate-200 px-5 py-2.5 text-sm font-semibold text-slate-500">Complet</span>
