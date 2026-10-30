@@ -1,7 +1,10 @@
 {
   "name": "gestion_evenements",
   "version": "1.0.0",
-  "main": "index.js",
+  "private": true,
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "dev": "npx @tailwindcss/cli -i ./static/src/input.css -o ./static/css/output.css --watch",
     "build": "npx @tailwindcss/cli -i ./static/src/input.css -o ./static/css/output.css --minify"

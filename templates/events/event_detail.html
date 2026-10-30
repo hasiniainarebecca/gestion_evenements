@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ evenement.titre }}{% endblock %}
+
+{% block content %}
+<a href="{% url 'event_list' %}" class="text-sm font-medium text-brand-600 hover:text-brand-700">&larr; Retour aux événements</a>
+
+<article class="mt-4 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+  <div class="flex flex-wrap items-center gap-2">
+    {% if evenement.categorie %}
+      <span class="inline-flex rounded-full bg-brand-100 px-2.5 py-0.5 text-xs font-medium text-brand-700">{{ evenement.categorie.nom }}</span>
+    {% endif %}
+
+    {% with restantes=evenement.places_restantes %}
+      {% if evenement.est_passe %}
+        <span class="inline-flex rounded-full bg-slate-200 px-2.5 py-0.5 text-xs font-medium text-slate-700">Terminé</span>
+      {% elif restantes <= 0 %}
+        <span class="inline-flex rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-800">Complet</span>
+      {% elif restantes <= 3 %}
+        <span class="inline-flex rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-medium text-amber-800">Plus que {{ restantes }} place{{ restantes|pluralize }}</span>
+      {% else %}
+        <span class="inline-flex rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-medium text-emerald-800">{{ restantes }} places restantes</span>
+      {% endif %}
+    {% endwith %}
+
+    {% if inscription_active %}
+      <span class="inline-flex rounded-full bg-brand-100 px-2.5 py-0.5 text-xs font-medium text-brand-700">Inscrit</span>
+    {% endif %}
+  </div>
+
+  <h1 class="mt-4 text-2xl font-bold text-slate-900 sm:text-3xl">{{ evenement.titre }}</h1>
+
+  <dl class="mt-6 grid gap-4 sm:grid-cols-3">
+    <div>
+      <dt class="text-sm text-slate-500">Date et heure</dt>
+      <dd class="font-medium text-slate-900">{{ evenement.date_debut|date:"d/m/Y à H:i" }}</dd>
+    </div>
+    <div>
+      <dt class="text-sm text-slate-500">Lieu</dt>
+      <dd class="font-medium text-slate-900">{{ evenement.lieu }}</dd>
+    </div>
+    <div>
+      <dt class="text-sm text-slate-500">Capacité</dt>
+      <dd class="font-medium text-slate-900">{{ evenement.capacite }} places, {{ evenement.places_restantes }} restantes</dd>
+    </div>
+  </dl>
+
+  <div class="mt-6 border-t border-slate-200 pt-6">
+    <h2 class="text-xl font-semibold text-slate-900">Description</h2>
+    <p class="mt-2 whitespace-pre-line text-slate-700">{{ evenement.description }}</p>
+  </div>
+
+  <div class="mt-8 border-t border-slate-200 pt-6">
+    {% if evenement.est_passe %}
+      <p class="text-slate-600">Cet événement est terminé : les inscriptions sont closes.</p>
+
+    {% elif user.is_authenticated %}
+      {% if inscription_active %}
+        <p class="text-slate-700">Vous êtes inscrit(e) à cet événement.</p>
+        <a href="{% url 'cancel_registration' inscription_active.pk %}"
+           class="mt-3 inline-flex items-center rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700">Annuler mon inscription</a>
+
+      {% elif evenement.est_complet %}
+        <span class="inline-flex cursor-not-allowed items-center rounded-lg bg-slate-200 px-4 py-2 text-sm font-semibold text-slate-500">Complet</span>
+
+      {% else %}
+        <form method="post" action="{% url 'register' evenement.pk %}">
+          {% csrf_token %}
+          <button type="submit"
+                  class="inline-flex items-center rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-brand-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2">S'inscrire</button>
+        </form>
+      {% endif %}
+
+    {% else %}
+      <a href="{% url 'login' %}?next={{ request.path }}"
+         class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">Se connecter pour s'inscrire</a>
+    {% endif %}
+  </div>
+</article>
+{% endblock %}
