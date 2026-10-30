@@ -3,28 +3,32 @@
 {% block title %}Événements à venir{% endblock %}
 
 {% block content %}
-<h1 class="text-2xl font-bold text-slate-900 sm:text-3xl">Événements à venir</h1>
+<section class="rounded-3xl bg-linear-to-br from-brand-900 to-brand-700 px-6 py-10 text-white shadow-lg sm:px-10 sm:py-14">
+  <p class="text-xs font-semibold uppercase tracking-[0.25em] text-gold-400">Agenda</p>
+  <h1 class="mt-3 text-3xl font-semibold sm:text-5xl">Événements à venir</h1>
+  <p class="mt-3 max-w-xl text-brand-100">Ateliers, conférences et rencontres : trouvez votre prochain rendez-vous et réservez votre place en quelques clics.</p>
 
-<form method="get" class="mt-6 flex flex-col gap-3 sm:flex-row">
-  <input type="search" name="q" value="{{ q }}" placeholder="Rechercher par titre"
-         aria-label="Rechercher par titre"
-         class="block w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 shadow-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30">
+  <form method="get" class="mt-8 flex flex-col gap-3 sm:flex-row">
+    <input type="search" name="q" value="{{ q }}" placeholder="Rechercher par titre"
+           aria-label="Rechercher par titre"
+           class="block w-full rounded-xl border-0 bg-white px-4 py-3 text-slate-900 shadow-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-gold-400">
 
-  <select name="categorie" aria-label="Catégorie"
-          class="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 shadow-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30 sm:w-64">
-    <option value="">Toutes les catégories</option>
-    {% for c in categories %}
-      <option value="{{ c.pk }}" {% if c.pk|stringformat:'s' == categorie_id %}selected{% endif %}>{{ c.nom }}</option>
-    {% endfor %}
-  </select>
+    <select name="categorie" aria-label="Catégorie"
+            class="block w-full rounded-xl border-0 bg-white px-4 py-3 text-slate-900 shadow-sm focus:outline-none focus:ring-2 focus:ring-gold-400 sm:w-64">
+      <option value="">Toutes les catégories</option>
+      {% for c in categories %}
+        <option value="{{ c.pk }}" {% if c.pk|stringformat:'s' == categorie_id %}selected{% endif %}>{{ c.nom }}</option>
+      {% endfor %}
+    </select>
 
-  <button type="submit"
-          class="inline-flex items-center justify-center rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-brand-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2">
-    Rechercher
-  </button>
-</form>
+    <button type="submit"
+            class="inline-flex items-center justify-center rounded-xl bg-gold-500 px-6 py-3 text-sm font-semibold text-brand-900 shadow-sm transition hover:bg-gold-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-white">
+      Rechercher
+    </button>
+  </form>
+</section>
 
-<p class="mt-4 text-sm text-slate-600">
+<p class="mt-8 text-sm text-slate-600">
   {{ page_obj.paginator.count }} événement{{ page_obj.paginator.count|pluralize }} trouvé{{ page_obj.paginator.count|pluralize }}
 </p>
 
@@ -32,7 +36,7 @@
   {% for evenement in page_obj %}
     {% include 'partials/event_card.html' with evenement=evenement %}
   {% empty %}
-    <p class="rounded-lg border border-slate-200 bg-white p-6 text-slate-600 sm:col-span-full">
+    <p class="rounded-2xl border border-slate-200 bg-white p-8 text-center text-slate-600 sm:col-span-full">
       Aucun événement à venir ne correspond à votre recherche.
     </p>
   {% endfor %}

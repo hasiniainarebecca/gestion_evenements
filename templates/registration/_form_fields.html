@@ -1,17 +1,14 @@
 {% if form.non_field_errors %}
-  <div role="alert" class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
-    {% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
-  </div>
+<div role="alert" class="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+  {% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
+</div>
 {% endif %}
+
 {% for field in form %}
-  <div>
-    <label for="{{ field.id_for_label }}" class="mb-1 block text-sm font-medium text-slate-700">{{ field.label }}</label>
-    {{ field }}
-    {% if field.help_text %}
-      <div class="mt-1 text-sm text-slate-600">{{ field.help_text|safe }}</div>
-    {% endif %}
-    {% for error in field.errors %}
-      <p class="mt-1 text-sm text-red-600">{{ error }}</p>
-    {% endfor %}
-  </div>
+<div class="mb-5">
+  <label for="{{ field.id_for_label }}" class="mb-1.5 block text-sm font-semibold text-brand-900">{{ field.label }}</label>
+  {{ field }}
+  {% if field.help_text %}<div class="mt-1.5 text-xs leading-relaxed text-slate-500">{{ field.help_text|safe }}</div>{% endif %}
+  {% for error in field.errors %}<p class="mt-1.5 text-sm font-medium text-red-600">{{ error }}</p>{% endfor %}
+</div>
 {% endfor %}

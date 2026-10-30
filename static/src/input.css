@@ -1,9 +1,40 @@
 @import 'tailwindcss';
 
 @theme {
-  --color-brand-50: #eef2ff;
-  --color-brand-100: #e0e7ff;
-  --color-brand-500: #6366f1;
-  --color-brand-600: #4f46e5;
-  --color-brand-700: #4338ca;
+  /* Marque : bleu nuit */
+  --color-brand-50: #eef0fb;
+  --color-brand-100: #dde1f6;
+  --color-brand-500: #4650b8;
+  --color-brand-600: #353f9a;
+  --color-brand-700: #272f7a;
+  --color-brand-800: #1c2259;
+  --color-brand-900: #131840;
+
+  /* Accent : or doux */
+  --color-gold-100: #f6ecd2;
+  --color-gold-400: #d6b25e;
+  --color-gold-500: #c9a24b;
+  --color-gold-600: #8f6d1f;
+
+  /* Fond crème */
+  --color-cream: #faf8f4;
+
+  /* Gris chauds, à la place des gris froids */
+  --color-slate-50: #faf9f6;
+  --color-slate-100: #f3f1ec;
+  --color-slate-200: #e7e4dc;
+  --color-slate-300: #d4d0c5;
+  --color-slate-400: #a8a396;
+  --color-slate-500: #6f6b5f;
+  --color-slate-600: #5c584d;
+  --color-slate-700: #45423a;
+  --color-slate-800: #2c2a25;
+  --color-slate-900: #1a1916;
+}
+
+@layer base {
+  h1, h2, h3 {
+    font-family: ui-serif, Georgia, Cambria, 'Times New Roman', serif;
+    letter-spacing: -0.01em;
+  }
 }
