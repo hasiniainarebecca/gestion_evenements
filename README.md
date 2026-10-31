@@ -21,7 +21,8 @@ Projet pratique Django, M1 GL, Université de Vakinankaratra. Application web de
 git clone https://github.com/hasiniainarebecca/gestion_evenements.git
 cd gestion_evenements
 python -m venv venv
-venv\Scripts\activate          # Windows
+venv\Scripts\activate          # Windows (Invite de commandes)
+.\venv\Scripts\Activate.ps1    # Windows (PowerShell)
 source venv/bin/activate       # Linux et Mac
 pip install -r requirements.txt
 python manage.py migrate       # crée la base SQLite (db.sqlite3)
@@ -30,6 +31,7 @@ python manage.py runserver
 ```
 
 Ouvrir ensuite http://127.0.0.1:8000/ dans le navigateur. Sous Linux et Mac, remplacer `python` par `python3` si besoin.
+Si PowerShell refuse d'exécuter le script d'activation, taper une fois `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`, puis relancer l'activation.
 
 ## Comptes de démonstration
 
